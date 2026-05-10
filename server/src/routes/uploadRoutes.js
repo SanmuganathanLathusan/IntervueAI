@@ -1,5 +1,6 @@
 const express = require('express');
 const upload = require('../middleware/upload');
+const authMiddleware = require('../middleware/auth');
 const { extractTextFromPdf, resolveUploadPath } = require('../utils/pdf');
 
 const router = express.Router();
@@ -36,7 +37,12 @@ const handleUploadPdf = async (req, res) => {
       return res.status(400).json({ message: 'A PDF file is required' });
     }
 
+    console.log(`[Upload] Processing: ${req.file.originalname} (${req.file.size} bytes)`);
     const pdfText = await extractTextFromPdf({ filePath: req.file.path });
+
+    if (!pdfText || pdfText.trim().length < 50) {
+      return res.status(422).json({ message: 'PDF appears to be empty or unreadable. Please upload a text-based PDF.' });
+    }
 
     return res.status(201).json({
       message: 'PDF uploaded successfully',
@@ -45,11 +51,13 @@ const handleUploadPdf = async (req, res) => {
       pdfText,
     });
   } catch (error) {
+    console.error('[Upload] Error:', error.message);
     return res.status(500).json({ message: 'Failed to upload PDF', error: error.message });
   }
 };
 
-router.post('/upload-pdf', upload.single('file'), handleUploadPdf);
-router.post('/extract-text', upload.single('file'), handleExtractText);
+// Both routes require authentication to prevent anonymous abuse
+router.post('/upload-pdf', authMiddleware, upload.single('file'), handleUploadPdf);
+router.post('/extract-text', authMiddleware, upload.single('file'), handleExtractText);
 
 module.exports = router;

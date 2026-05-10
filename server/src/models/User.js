@@ -14,6 +14,9 @@ const userSchema = new mongoose.Schema(
       trim: true,
       lowercase: true,
     },
+    avatar: {
+      type: String, // Can store a URL or a base64 encoded string
+    },
     password: {
       type: String,
       required: true,

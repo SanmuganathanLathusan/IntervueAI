@@ -37,12 +37,13 @@ export const getStoredUser = (): User | null => {
 
   try {
     const payload = token.split('.')[1];
-    const decoded = JSON.parse(base64UrlDecode(payload)) as { userId?: string; name?: string; email?: string };
+    const decoded = JSON.parse(base64UrlDecode(payload)) as { userId?: string; name?: string; email?: string; avatar?: string };
     if (!decoded.userId) return null;
     return {
       id: decoded.userId,
       name: decoded.name || 'Interview User',
       email: decoded.email || '',
+      avatar: decoded.avatar,
     };
   } catch {
     return null;

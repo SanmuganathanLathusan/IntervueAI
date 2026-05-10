@@ -36,7 +36,10 @@ export default function ResultsPage() {
   }, [router]);
 
   const latestInterview = report?.interviews?.[0];
-  const score = latestInterview ? latestInterview.scoreSummary.averageScore * 10 : 0;
+  // averageScore is 0–10 scale from the AI; multiply by 10 for a 0–100 percentage display
+  const score = latestInterview
+    ? Math.min(100, Math.round((latestInterview.scoreSummary.averageScore ?? 0) * 10))
+    : 0;
 
   return (
     <Shell>
@@ -145,11 +148,20 @@ export default function ResultsPage() {
               {latestInterview.answers.map((answer, index) => (
                 <div key={answer.questionId} className="glass-panel overflow-hidden border-slate-200 hover:shadow-md transition">
                   <div className="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center cursor-pointer">
-                    <div className="text-sm font-semibold text-slate-600">
-                      Question {index + 1}: <span className="text-navy-900">Technical</span>
+                  <div className="text-sm font-semibold text-slate-600">
+                      Question {index + 1}:{' '}
+                      <span className="text-navy-900 capitalize">
+                        {answer.question ? (
+                          // Derive category from the answer's question text is not possible;
+                          // The InterviewAnswer type doesn't carry category — show index-based label
+                          latestInterview.questions.find((q) => q.id === answer.questionId)?.category ?? 'general'
+                        ) : 'general'}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-aqua-600">{answer.score * 10}/100</span>
+                      <span className="font-bold text-aqua-600">
+                        {Math.min(100, Math.round(answer.score * 10))}/100
+                      </span>
                       <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 text-aqua-500"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
                   </div>

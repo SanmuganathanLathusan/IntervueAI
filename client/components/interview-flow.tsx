@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiJson } from '@/lib/api';
-import { clearSession, getStoredUser } from '@/lib/auth';
-import type { InterviewSession, Question } from '@/lib/types';
+import { clearSession, getStoredToken, getStoredUser } from '@/lib/auth';
+import type { InterviewSession, Question, User } from '@/lib/types';
 
 type SessionStorageShape = {
   interviewId: string;
@@ -33,13 +33,17 @@ export const InterviewFlow = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [user, setUser] = useState<User | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
-    const user = getStoredUser();
-    if (!user) {
+    const currentUser = getStoredUser();
+    if (!currentUser) {
       router.push('/login');
       return;
     }
+    setUser(currentUser);
 
     try {
       const rawSession = window.localStorage.getItem(SESSION_KEY);
@@ -62,6 +66,60 @@ export const InterviewFlow = () => {
     window.localStorage.setItem(SESSION_KEY, JSON.stringify(nextSession));
   };
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        
+        recognition.onresult = (event: any) => {
+          let finalTranscript = '';
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+              finalTranscript += event.results[i][0].transcript;
+            }
+          }
+          if (finalTranscript) {
+            setDraftAnswer((prev) => prev ? prev + ' ' + finalTranscript : finalTranscript);
+          }
+        };
+
+        recognition.onend = () => {
+          setIsListening(false);
+        };
+
+        recognitionRef.current = recognition;
+      }
+    }
+    
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, []);
+
+  const toggleListening = () => {
+    if (!recognitionRef.current) {
+      alert("Your browser doesn't support speech recognition. Try Google Chrome.");
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      try {
+        recognitionRef.current.start();
+        setIsListening(true);
+      } catch (err) {
+        console.error("Speech recognition error:", err);
+      }
+    }
+  };
+
   const handleSubmit = async () => {
     if (!session || !currentQuestion || !draftAnswer.trim()) {
       setError('Write an answer before continuing.');
@@ -72,8 +130,17 @@ export const InterviewFlow = () => {
     setError('');
 
     try {
+      // Pass the auth token — this route requires authentication (authMiddleware)
+      const token = getStoredToken();
+      if (!token) {
+        clearSession();
+        router.push('/login');
+        return;
+      }
+
       const response = await apiJson<EvaluationResponse>('/api/evaluate-answer', {
         method: 'POST',
+        token,
         body: {
           interviewId: session.interviewId,
           questionId: currentQuestion.id,
@@ -118,6 +185,10 @@ export const InterviewFlow = () => {
     setCurrentIndex((value) => value + 1);
     setEvaluation(null);
     setDraftAnswer('');
+    if (isListening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
   };
 
   if (loading) {
@@ -135,11 +206,14 @@ export const InterviewFlow = () => {
     );
   }
 
-  if (!session || !currentQuestion) {
+  if (!session || !currentQuestion || !user) {
     return null;
   }
 
   const isLastQuestion = currentIndex >= session.questions.length - 1;
+  const avatarUrl = user?.avatar || (user?.email 
+    ? `https://i.pravatar.cc/150?u=${encodeURIComponent(user.email)}`
+    : `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=0D8ABC&color=fff`);
 
   return (
     <div className="max-w-5xl mx-auto flex flex-col h-[calc(100vh-120px)] relative">
@@ -220,36 +294,36 @@ export const InterviewFlow = () => {
                  {isLastQuestion ? 'Finish Interview' : 'Next Question'}
                </button>
              </div>
-             <div className="w-10 h-10 rounded-full bg-slate-300 border-2 border-white shadow-sm overflow-hidden flex items-center justify-center flex-shrink-0">
-               <img src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="User avatar" className="w-full h-full object-cover" />
+             <div className="w-10 h-10 rounded-full bg-aqua-100 border-2 border-white shadow-sm overflow-hidden flex items-center justify-center flex-shrink-0">
+               <img 
+                 src={avatarUrl} 
+                 alt={user?.name || 'User avatar'} 
+                 className="w-full h-full object-cover"
+                 onError={(e) => {
+                   (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'U')}&background=0D8ABC&color=fff`;
+                 }}
+               />
              </div>
           </div>
         )}
 
-        {/* User Response Draft (if not answered) */}
-        {!evaluation && (
+        {/* User Response — shown only after evaluation so user can see what they typed */}
+        {evaluation && (
           <div className="flex gap-4 justify-end">
-            <div className="bg-navy-900 text-white p-6 w-full max-w-3xl rounded-tr-sm rounded-2xl relative shadow-lg">
-              <div className="flex justify-between items-center mb-4 text-xs font-bold text-slate-400 uppercase tracking-wide">
-                <span>Your Response (Live Transcription)</span>
-                <span className="flex items-center gap-2 text-aqua-400">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-aqua-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-aqua-500"></span>
-                  </span>
-                  Listening...
-                </span>
-              </div>
-              <textarea
-                value={draftAnswer}
-                onChange={(e) => setDraftAnswer(e.target.value)}
-                placeholder="Start speaking or type your answer here..."
-                className="w-full min-h-[150px] bg-transparent text-white placeholder:text-slate-500 resize-none outline-none text-lg leading-relaxed"
+            <div className="bg-navy-900 text-white px-6 py-4 max-w-3xl rounded-tr-sm rounded-2xl shadow-lg">
+              <div className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Your Answer</div>
+              <p className="text-white leading-relaxed whitespace-pre-wrap">{draftAnswer}</p>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-aqua-100 border-2 border-white shadow-sm overflow-hidden flex items-center justify-center flex-shrink-0">
+              <img
+                src={avatarUrl}
+                alt={user?.name || 'User avatar'}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'U')}&background=0D8ABC&color=fff`;
+                }}
               />
             </div>
-            <div className="w-10 h-10 rounded-full bg-slate-300 border-2 border-white shadow-sm overflow-hidden flex items-center justify-center flex-shrink-0">
-               <img src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="User avatar" className="w-full h-full object-cover" />
-             </div>
           </div>
         )}
         
@@ -308,10 +382,22 @@ export const InterviewFlow = () => {
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
             </svg>
           </button>
-          <button className="w-12 h-12 rounded-full bg-aqua-500 text-white flex items-center justify-center hover:bg-aqua-600 transition shadow-md">
-             <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
-             </svg>
+          <button 
+            onClick={toggleListening}
+            className={`w-12 h-12 rounded-full text-white flex items-center justify-center transition shadow-md ${
+              isListening ? 'bg-red-500 hover:bg-red-600 animate-pulse' : 'bg-aqua-500 hover:bg-aqua-600'
+            }`}
+            title={isListening ? "Stop listening" : "Start speaking"}
+          >
+             {isListening ? (
+               <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
+                 <rect x="6" y="6" width="12" height="12" rx="2" />
+               </svg>
+             ) : (
+               <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+               </svg>
+             )}
           </button>
         </div>
       )}

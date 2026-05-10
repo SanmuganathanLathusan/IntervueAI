@@ -3,6 +3,7 @@ export type User = {
   name: string;
   username?: string;
   email: string;
+  avatar?: string;
 };
 
 export type Question = {
@@ -23,25 +24,26 @@ export type InterviewAnswer = {
   strengths: string[];
   weaknesses: string[];
   improvementTips: string[];
-  answeredAt: string;
+  answeredAt?: string;
+};
+
+export type ScoreSummary = {
+  totalScore: number;
+  averageScore: number;
+  strengths: string[];
+  weaknesses: string[];
+  improvementTips: string[];
 };
 
 export type InterviewSession = {
-  id?: string;
+  /** MongoDB document id — always use _id, not id */
   _id: string;
   userId: string;
-  pdfText: string;
-  role?: string;
+  pdfText?: string;
   questions: Question[];
   answers: InterviewAnswer[];
   scores: number[];
-  scoreSummary: {
-    totalScore: number;
-    averageScore: number;
-    strengths: string[];
-    weaknesses: string[];
-    improvementTips: string[];
-  };
+  scoreSummary: ScoreSummary;
   createdAt: string;
   updatedAt: string;
 };
@@ -56,3 +58,4 @@ export type ReportResponse = {
   improvementTips: string[];
   interviews: InterviewSession[];
 };
+

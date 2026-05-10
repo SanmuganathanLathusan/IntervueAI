@@ -27,7 +27,12 @@ const getReport = async (req, res) => {
       return res.status(403).json({ message: 'You can only access your own report' });
     }
 
-    const interviews = await Interview.find({ userId }).sort({ createdAt: -1 });
+    // Limit to 50 most recent interviews; exclude pdfText to avoid massive payloads
+    const interviews = await Interview.find({ userId })
+      .sort({ createdAt: -1 })
+      .limit(50)
+      .select('-pdfText');
+
     const summary = buildReport(interviews);
 
     return res.json({
