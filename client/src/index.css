@@ -1,0 +1,125 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: #f8fafc;
+  color: #0f172a; /* navy-950 */
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  letter-spacing: -0.02em;
+}
+
+::selection {
+  background: rgba(6, 182, 212, 0.25); /* aqua-500 at 25% */
+  color: #0B132B;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+input,
+textarea,
+select,
+button {
+  font: inherit;
+}
+
+/* Scrollbar styling for a cleaner look */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1; /* slate-300 */
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8; /* slate-400 */
+}
+
+@layer utilities {
+  /* Card / Panel */
+  .glass-panel {
+    @apply border border-slate-200 bg-white shadow-soft rounded-2xl;
+  }
+
+  .soft-outline {
+    @apply border border-slate-200 transition hover:border-aqua-500 hover:shadow-soft;
+  }
+
+  /* Reusable button utilities */
+  .btn-primary {
+    @apply bg-navy-900 text-white font-bold rounded-xl hover:bg-navy-800 transition shadow-sm disabled:opacity-60 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply bg-white border border-slate-200 text-navy-900 font-semibold rounded-xl hover:bg-slate-50 transition shadow-sm;
+  }
+
+  /* Keyboard focus ring — consistent across all interactive elements */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-aqua-500 focus:ring-offset-2;
+  }
+
+  /* Small badge / tag */
+  .tag {
+    @apply inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full;
+  }
+}
+
+@media print {
+  .no-print, 
+  nav, 
+  aside, 
+  header,
+  button, 
+  footer,
+  .sidebar-link {
+    display: none !important;
+  }
+  
+  .glass-panel {
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: none !important;
+    background: white !important;
+    page-break-inside: avoid;
+  }
+  
+  body, .shell-content {
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  .max-w-5xl {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+}
+
