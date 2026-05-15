@@ -36,6 +36,10 @@ export default function DashboardPage() {
     setUserName(user.name || 'User');
 
     try {
+      if (!user.id) {
+        console.warn("User ID not found in stored user data");
+        return;
+      }
       const token = getStoredToken();
       const response = await apiJson<ReportResponse>(`/api/report/${user.id}`, { 
         token: token || undefined 

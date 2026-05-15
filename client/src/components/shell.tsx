@@ -15,6 +15,15 @@ type ShellProps = {
 
 const navigation = [
   {
+    href: '/',
+    label: 'Home',
+    icon: (
+      <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+      </svg>
+    ),
+  },
+  {
     href: '/dashboard',
     label: 'Dashboard',
     icon: (
@@ -99,8 +108,15 @@ export const Shell = ({ children, title, subtitle, hideSidebar = false }: ShellP
       {!hideSidebar && (
         <aside className="w-64 flex-shrink-0 bg-white border-r border-slate-200 flex flex-col sticky top-0 h-screen overflow-y-auto">
           <div className="p-6">
-            <h1 className="text-xl font-bold text-navy-900 tracking-tight">IntervueAI</h1>
-            <p className="text-[10px] font-bold text-aqua-600 tracking-widest mt-1 uppercase">Elite Evaluation</p>
+            <Link to="/" className="flex items-center gap-3 group">
+              <div className="w-9 h-9 bg-navy-900 rounded-lg flex items-center justify-center overflow-hidden shadow-sm group-hover:scale-105 transition-transform">
+                <img src="/logo.jpg" alt="IntervueAI Logo" className="w-full h-full object-cover" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-navy-900 tracking-tight leading-none">IntervueAI</h1>
+                <p className="text-[10px] font-bold text-aqua-600 tracking-widest mt-1 uppercase">Elite Evaluation</p>
+              </div>
+            </Link>
           </div>
           <nav className="flex-1 px-4 space-y-1.5 mt-2">
             {navigation.map((item) => {

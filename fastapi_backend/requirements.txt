@@ -10,3 +10,5 @@ google-generativeai
 python-dotenv
 httpx
 PyMuPDF
+google-genai
+tenacity

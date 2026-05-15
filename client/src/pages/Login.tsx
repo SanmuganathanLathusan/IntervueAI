@@ -1,4 +1,5 @@
 import { AuthForm } from '@/components/auth-form';
+import { Link } from 'react-router-dom';
 
 export default function LoginPage() {
   return (
@@ -11,9 +12,14 @@ export default function LoginPage() {
           <div className="absolute bottom-1/4 right-1/4 w-64 h-64 rounded-full bg-aqua-300 blur-3xl"></div>
         </div>
 
-        <div className="relative z-10">
-          <div className="text-2xl font-bold tracking-tight mb-1">IntervueAI</div>
-          <div className="text-xs font-bold text-aqua-400 tracking-widest uppercase">Elite Evaluation</div>
+        <div className="relative z-10 flex items-center gap-3">
+          <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center overflow-hidden shadow-sm group">
+            <img src="/logo.jpg" alt="IntervueAI Logo" className="w-full h-full object-cover" />
+          </div>
+          <div>
+            <div className="text-2xl font-bold tracking-tight mb-0.5">IntervueAI</div>
+            <div className="text-[10px] font-bold text-aqua-400 tracking-widest uppercase">Elite Evaluation</div>
+          </div>
         </div>
 
         <div className="relative z-10">
@@ -32,7 +38,7 @@ export default function LoginPage() {
             </div>
             <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
               <div className="text-3xl font-bold text-aqua-400">AI</div>
-              <div className="text-sm text-slate-400 mt-1">Powered by Gemini 2.5</div>
+              <div className="text-sm text-slate-400 mt-1">Advanced AI Engine</div>
             </div>
           </div>
         </div>
@@ -42,8 +48,13 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right Panel */}
-      <div className="flex-1 flex items-center justify-center p-8">
+      <div className="flex-1 flex flex-col items-center justify-center p-8 relative">
+        <Link to="/" className="absolute top-8 left-8 flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-navy-900 transition group">
+           <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4 group-hover:-translate-x-1 transition-transform">
+             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+           </svg>
+           Back to Home
+        </Link>
         <div className="w-full max-w-md">
           <AuthForm mode="login" />
         </div>

@@ -7,7 +7,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(override=True)
 
 SECRET_KEY = os.getenv("JWT_SECRET")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
@@ -42,7 +42,12 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("userId")
         if user_id is None:
+            print(f"Auth failure: No userId in payload")
             raise credentials_exception
         return {"userId": user_id, "email": payload.get("email"), "name": payload.get("name")}
-    except JWTError:
+    except JWTError as e:
+        print(f"JWT decode error: {str(e)}")
+        raise credentials_exception
+    except Exception as e:
+        print(f"Auth system error: {str(e)}")
         raise credentials_exception

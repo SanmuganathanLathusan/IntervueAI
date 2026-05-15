@@ -99,7 +99,7 @@ export default function ChatPage() {
     {
       id: 'welcome',
       role: 'assistant',
-      content: `👋 Hi! I'm your **IntervueAI Coach** — your personal interview prep expert powered by Gemini AI.
+      content: `👋 Hi! I'm your **IntervueAI Coach** — your personal interview prep expert.
 
 I can help you with:
 - **Interview preparation** — practice questions, STAR method, mock answers
@@ -189,7 +189,7 @@ What would you like to work on today?`,
       {
         id: 'welcome',
         role: 'assistant',
-        content: `👋 Hi! I'm your **IntervueAI Coach** — your personal interview prep expert powered by Gemini AI.
+        content: `👋 Hi! I'm your **IntervueAI Coach** — your personal interview prep expert.
 
 I can help you with:
 - **Interview preparation** — practice questions, STAR method, mock answers
@@ -208,7 +208,7 @@ What would you like to work on today?`,
   const showSuggestions = messages.length <= 1;
 
   return (
-    <Shell title="AI Coach Chat" subtitle="Powered by Gemini AI — Ask anything about interviews & careers">
+    <Shell title="AI Coach Chat" subtitle="Advanced AI Assistant — Ask anything about interviews & careers">
       <style>{`
         .chat-content p.chat-p { margin-bottom: 0.5rem; }
         .chat-content ul.chat-ul { margin: 0.4rem 0; padding-left: 0; list-style: none; }
@@ -233,7 +233,7 @@ What would you like to work on today?`,
               <p className="font-semibold text-navy-900 text-sm">IntervueAI Coach</p>
               <div className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-                <span className="text-xs text-slate-500">Gemini AI • Online</span>
+                <span className="text-xs text-slate-500">AI Assistant • Online</span>
               </div>
             </div>
           </div>

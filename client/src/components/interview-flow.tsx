@@ -219,14 +219,21 @@ export const InterviewFlow = () => {
     <div className="max-w-5xl mx-auto flex flex-col h-[calc(100vh-120px)] relative">
       {/* Top Session Header */}
       <div className="flex flex-wrap items-center justify-between mb-8 pb-4 border-b border-slate-200">
-        <div>
-          <h1 className="text-2xl font-bold text-navy-900 tracking-tight">Interview Role</h1>
-          <div className="text-sm text-slate-500 mt-1 flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-navy-900 border border-slate-200">
+            <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+            </svg>
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-navy-900 tracking-tight">Interview Session</h1>
+            <div className="text-sm text-slate-500 mt-0.5 flex items-center gap-2">
             <span>Session in progress</span>
             <span>&bull;</span>
             <span>Question {currentIndex + 1} of {session.questions.length}</span>
           </div>
         </div>
+      </div>
         <div className="flex items-center gap-3">
           {submitting && (
             <div className="flex items-center gap-2 text-xs font-bold text-aqua-600 bg-aqua-50 px-3 py-1.5 rounded-full uppercase tracking-wider">

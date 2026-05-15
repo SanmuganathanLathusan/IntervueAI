@@ -1,6 +1,0 @@
-{
-  "watch": ["src"],
-  "ext": "js,mjs,cjs,json",
-  "ignore": ["uploads", "uploads/*", "**/uploads/**", "*.pdf", "scratch/*"],
-  "delay": "2500"
-}

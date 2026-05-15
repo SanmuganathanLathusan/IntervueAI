@@ -40,7 +40,7 @@ export default function ResultsPage() {
 
   const latestInterview = report?.interviews?.[0];
   // averageScore is 0–10 scale from the AI; multiply by 10 for a 0–100 percentage display
-  const score = latestInterview
+  const score = latestInterview && latestInterview.scoreSummary
     ? Math.min(100, Math.round((latestInterview.scoreSummary.averageScore ?? 0) * 10))
     : 0;
 
