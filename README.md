@@ -7,7 +7,6 @@
 
 **IntervueAI** is an elite AI-driven interview simulation and preparation platform. Precision-engineered to dismantle interview anxiety and build professional authority, it provides real-time coaching, behavioral analysis, and industry-specific feedback to help you land your dream role.
 
-![IntervueAI Hero](client/public/hero-wide.png)
 
 ## ✨ Features
 
@@ -78,12 +77,6 @@ npm run dev
 ```
 
 ---
-
-## 📸 Screenshots
-
-| Landing Page | Dashboard |
-| :---: | :---: |
-| ![Home](client/public/hero-preview.png) | ![Logo](client/public/logo.png) |
 
 ---
 
